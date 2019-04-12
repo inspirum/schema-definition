@@ -1,0 +1,24 @@
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:typ="types.xsd"
+           targetNamespace="stock.xsd"
+           xmlns="https://inspishop.cz/xml/v1">
+    <xs:import namespace="types.xsd" schemaLocation="types.xsd"/>
+    <xs:element name="feed">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- time this xml was generated in format YYYY-MM-DDThh:mm:ss -->
+                <xs:element type="xs:dateTime" name="updated"/>
+                <!-- id of domain for which the feed is, by default main domain -->
+                <xs:element type="xs:integer" name="domain_id" minOccurs="0"/>
+                <!-- element containing all stocks -->
+                <xs:element name="stocks">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- one single stock -->
+                            <xs:element type="typ:simple_stock" name="stock" maxOccurs="unbounded" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

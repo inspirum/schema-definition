@@ -1,0 +1,176 @@
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:typ="types.xsd"
+           targetNamespace="products.xsd"
+           xmlns="https://inspishop.cz/xml/v1">
+    <xs:import namespace="types.xsd" schemaLocation="types.xsd"/>
+    <xs:element name="feed">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- time this xml was generated in format YYYY-MM-DDThh:mm:ss -->
+                <xs:element type="xs:dateTime" name="updated"/>
+                <!-- id of domain for which the feed is, by default main domain -->
+                <xs:element type="xs:integer" name="domain_id" minOccurs="0"/>
+                <!-- element containing all products -->
+                <xs:element name="products">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- single product element -->
+                            <xs:element name="product" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <!-- external id of the product -->
+                                        <xs:element type="xs:string" name="remote_id"/>
+                                        <!-- internal id of the product -->
+                                        <xs:element type="xs:integer" name="id" minOccurs="0"/>
+                                        <!-- parent product id if this product is variant -->
+                                        <xs:element type="typ:id" name="parent" minOccurs="0"/>
+                                        <!-- code of the product -->
+                                        <xs:element type="xs:string" name="code" minOccurs="0"/>
+                                        <!-- 0/1 if the product should be visible in this domain in the shop -->
+                                        <xs:element type="xs:boolean" name="active" default="0" minOccurs="0"/>
+                                        <!-- 0/1 if the product should be visible in this domain in the shop -->
+                                        <xs:element type="xs:boolean" name="unsaleable" default="0" minOccurs="0"/>
+                                        <!-- product rank for sorting in some components (the higher the more in the beginning) -->
+                                        <xs:element type="xs:float" name="rank" default="0" minOccurs="0"/>
+                                        <!-- product EAN -->
+                                        <xs:element type="typ:ean" name="EAN" minOccurs="0"/>
+                                        <!-- product PLU -->
+                                        <xs:element type="typ:plu" name="PLU" minOccurs="0"/>
+                                        <!-- product SKU -->
+                                        <xs:element type="xs:string" name="SKU" minOccurs="0"/>
+                                        <!-- product height -->
+                                        <xs:element type="xs:float" name="height" default="0" minOccurs="0"/>
+                                        <!-- product width -->
+                                        <xs:element type="xs:float" name="width" default="0" minOccurs="0"/>
+                                        <!-- product length -->
+                                        <xs:element type="xs:float" name="length" default="0" minOccurs="0"/>
+                                        <!-- product weight -->
+                                        <xs:element type="xs:float" name="weight" default="0" minOccurs="0"/>
+                                        <!-- main product image -->
+                                        <xs:element type="typ:image" name="main_image" minOccurs="0"/>
+                                        <!-- all other product images -->
+                                        <xs:element name="images" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- single image -->
+                                                    <xs:element type="typ:image" name="image" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- product texts translations -->
+                                        <xs:element name="translations" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- one specific translation -->
+                                                    <xs:element type="typ:product_translation" name="translation"
+                                                                maxOccurs="unbounded"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- id/code/remote_id of main product category (will be in breadcrumbs) -->
+                                        <xs:element name="main_category" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- one specific translation -->
+                                                    <xs:element type="typ:id" name="id"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all other categories product is in -->
+                                        <xs:element name="categories" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id/code/remote_id of other category product is in -->
+                                                    <xs:element name="category" maxOccurs="unbounded"
+                                                                minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <!-- one specific translation -->
+                                                                <xs:element type="typ:id" name="id"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all product parameters -->
+                                        <xs:element name="parameters" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- one single product parameter -->
+                                                    <xs:element type="typ:parameter" name="parameter"
+                                                                maxOccurs="unbounded" minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- parameters to compose product variant names -->
+                                        <xs:element name="template_parameters" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id of one parameter -->
+                                                    <xs:element type="typ:id" name="id" maxOccurs="unbounded"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- information about product stock availability and settings -->
+                                        <xs:element type="typ:stock" name="stock" minOccurs="0"/>
+                                        <!-- all product prices -->
+                                        <xs:element name="prices" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- one single product price -->
+                                                    <xs:element type="typ:price" name="price" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all alternative products for this product -->
+                                        <xs:element name="alternative_products" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id/code/remote_id of alternative -->
+                                                    <xs:element type="typ:id" name="alternative" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all accessories for this product -->
+                                        <xs:element name="accessories" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id/code/remote_id of accessory -->
+                                                    <xs:element type="typ:id" name="accessory" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all related products for this product -->
+                                        <xs:element name="related_products" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id/code/remote_id of related product -->
+                                                    <xs:element type="typ:id" name="related" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- all gifts for this product -->
+                                        <xs:element name="gifts" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <!-- id/code/remote_id of gift -->
+                                                    <xs:element type="typ:id" name="gift" maxOccurs="unbounded"
+                                                                minOccurs="0"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,223 @@
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:typ="types.xsd"
+           xmlns="https://inspishop.cz/xml/v1" targetNamespace="types.xsd">
+    <!--
+    =================================
+        Attributes
+    =================================
+    -->
+    <xs:simpleType name="lang" final="restriction">
+        <xs:restriction base="xs:language">
+            <xs:enumeration value="cs"/>
+            <xs:enumeration value="de"/>
+            <xs:enumeration value="en"/>
+            <xs:enumeration value="es"/>
+            <xs:enumeration value="hu"/>
+            <xs:enumeration value="it"/>
+            <xs:enumeration value="sk"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!--
+    =================================
+        Simple types
+    =================================
+    -->
+    <xs:simpleType name="tax">
+        <xs:annotation>
+            <xs:documentation>Výše sazby dph.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:float">
+            <xs:minInclusive value="0.0"/>
+            <xs:maxInclusive value="1.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ean">
+        <xs:annotation>
+            <xs:documentation>EAN</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{8,13}"></xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="plu">
+        <xs:annotation>
+            <xs:documentation>Price look-up code</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{4,5}"></xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!--
+    =================================
+        Translation Complex types
+    =================================
+    -->
+
+    <xs:complexType name="product_translation">
+        <xs:annotation>
+            <xs:documentation>Product textations</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- product name -->
+            <xs:element type="xs:string" name="name"/>
+            <!-- product description -->
+            <xs:element type="xs:string" name="description" minOccurs="0"/>
+            <!-- product annotation/perex -->
+            <xs:element type="xs:string" name="perex" minOccurs="0"/>
+            <!-- product seo meta keywords -->
+            <xs:element type="xs:string" name="meta_keywords" minOccurs="0"/>
+            <!-- product seo meta title -->
+            <xs:element type="xs:string" name="meta_title" minOccurs="0"/>
+            <!-- product seo meta description -->
+            <xs:element type="xs:string" name="meta_description" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="typ:lang" name="lang" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="parameter_translation">
+        <xs:annotation>
+            <xs:documentation>Parameter textations</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element type="xs:string" name="name" minOccurs="0"/>
+            <xs:element type="xs:string" name="value"/>
+        </xs:sequence>
+        <xs:attribute type="typ:lang" name="lang" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="image_translation">
+        <xs:annotation>
+            <xs:documentation>Image textations</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element type="xs:string" name="description" minOccurs="0"/>
+            <xs:element type="xs:string" name="alt" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="typ:lang" name="lang" use="required"/>
+    </xs:complexType>
+
+    <!--
+    =================================
+        Complex types
+    =================================
+    -->
+
+    <xs:complexType name="id">
+        <xs:annotation>
+            <xs:documentation>Object identificator by id, code or remote_id. At least one of the values is mandatory.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:choice>
+            <xs:sequence>
+                <xs:element name="id" type="xs:integer"/>
+                <xs:element name="code" type="xs:string" minOccurs="0"/>
+                <xs:element name="remote_id" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:element name="code" type="xs:string"/>
+                <xs:element name="remote_id" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+            <xs:element name="remote_id" type="xs:string"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="parameter">
+        <xs:annotation>
+            <xs:documentation>Product parameter</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- parameter id/code, if the parameter with this code does not exist it is created -->
+            <xs:element type="typ:id" name="id"/>
+            <!-- value of this parameter -->
+            <xs:element name="translations">
+                <xs:complexType>
+                    <xs:sequence>
+                        <!-- one parameter translation -->
+                        <xs:element type="typ:parameter_translation" name="translation" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="image">
+        <xs:annotation>
+            <xs:documentation>Image</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element type="xs:anyURI" name="src"/>
+            <xs:element name="translations" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <!-- Other possible names en,sk,de,es,hu,it. translations can contain more of this elements, for example cs and en-->
+                        <xs:element type="typ:image_translation" name="translation" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="price">
+        <xs:annotation>
+            <xs:documentation>Product price</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- id/code of pricelist this price should be in if it does not exist it is created-->
+            <xs:element type="typ:id" name="pricelist"/>
+            <!-- currency code (CZE, EUR, ...) in which this price is -->
+            <xs:element type="xs:string" name="currency"/>
+            <!-- tax type the product is in -->
+            <xs:element type="typ:tax" name="tax" default="0.21" minOccurs="0"/>
+            <!-- shop price of the item (with tax) -->
+            <xs:element type="xs:float" name="normal_price"/>
+            <!-- purchase price of the item (with tax) -->
+            <xs:element type="xs:float" name="purchase_price" minOccurs="0"/>
+            <!-- minimum price of the item that it can be sold for (with tax) -->
+            <xs:element type="xs:float" name="minimum_price" default="0" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="stock">
+        <xs:annotation>
+            <xs:documentation>Product available stock and stock settings</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- product available amount -->
+            <xs:element type="xs:float" name="available" default="0" minOccurs="0"/>
+            <!-- product unit (pc, m2 ...) -->
+            <xs:element type="xs:string" name="unit" default="pc" minOccurs="0"/>
+            <!-- product minimum amount in cart -->
+            <xs:element type="xs:float" name="min" default="0" minOccurs="0"/>
+            <!-- product maximum amount in cart -->
+            <xs:element type="xs:float" name="max" default="0" minOccurs="0"/>
+            <!-- steps by which the item is added into cart (2 means user can add 2,4,6 and so on) -->
+            <xs:element type="xs:float" name="step" default="1" minOccurs="0"/>
+            <!-- 1/0 , 0 if only whole amounts can be added into the cart -->
+            <xs:element type="xs:boolean" name="rounding" default="0" minOccurs="0"/>
+            <!-- first available date the product can be delivered in YYYY-MM-DD format -->
+            <xs:element type="xs:date" name="delivery_date" minOccurs="0"/>
+            <!-- 1/0 if product should not be visible in shop if it has no stock available -->
+            <xs:element type="xs:boolean" name="check_stock" default="1" minOccurs="0"/>
+            <!-- 1/0 if it is possible to buy product even if it has no stock available -->
+            <xs:element type="xs:boolean" name="allow_minus_stock" default="0" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="simple_stock">
+        <xs:annotation>
+            <xs:documentation>Product available stock</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- id/code/remote_id of product having this stock -->
+            <xs:element type="typ:id" name="product"/>
+            <!-- id/code/remote_id of warehouse -->
+            <xs:element type="typ:id" name="warehouse" minOccurs="0"/>
+            <!-- available stock amount -->
+            <xs:element type="xs:float" name="available"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
